@@ -8,10 +8,7 @@ import {
   websocketListenMedia,
   websocketSendAudio,
   websocketSendEvent,
-  erpGetTools,
-  erpPlaceOrder,
-  erpCheckInventory,
-  erpCheckPrice,
+  elevenlabsConvert,
 } from "./functions";
 
 async function main() {
@@ -54,14 +51,10 @@ async function main() {
         rateLimit: 10000,
       }),
       restack.startWorker({
-        taskQueue: "erp",
+        taskQueue: "elevenlabs",
         workflowsPath,
-        functions: {
-          erpGetTools,
-          erpCheckPrice,
-          erpCheckInventory,
-          erpPlaceOrder,
-        },
+        functions: { elevenlabsConvert },
+        rateLimit: 10000,
       }),
     ]);
 

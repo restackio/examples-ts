@@ -26,19 +26,21 @@ export async function websocketListenMedia({ streamSid }: StreamInput) {
         if (message.event === "media") {
           if (message.media.track === "inbound") {
             // Clean Twilio empty noise
-            const cleanedPayload = message.media.payload?.replace(
-              /(\+\/[a-zA-Z0-9+\/]{2,}==)/g,
-              ""
-            );
-            if (!cleanedPayload) {
-              return;
-            }
+            // const cleanedPayload = message.media.payload?.replace(
+            //   /(\+\/[a-zA-Z0-9+\/]{2,}==)/g,
+            //   ""
+            // );
+            // if (!cleanedPayload) {
+            //   return;
+            // }
             log.info("send payload", {
               streamSid,
+              username: message.media.username,
               payload: message.media.payload.length,
             });
             const input: AudioIn = {
               streamSid,
+              username: message.media.username,
               payload: message.media.payload,
             };
             restack.sendWorkflowEvent({

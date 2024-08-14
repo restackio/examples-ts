@@ -3,7 +3,7 @@ import { Buffer } from "node:buffer";
 import "dotenv/config";
 import { createClient } from "@deepgram/sdk";
 
-const getAudioBuffer = async (stream: ReadableStream<Uint8Array>) => {
+export const getAudioBuffer = async (stream: ReadableStream<Uint8Array>) => {
   const reader = stream.getReader();
   const chunks = [];
 

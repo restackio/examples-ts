@@ -21,6 +21,7 @@ export async function deepgramListen({
     const response = await deepgram.listen.prerecorded.transcribeFile(
       decodedBuffer,
       {
+        detect_language: true,
         encoding: "mulaw",
         sample_rate: 8000,
         model: "nova-2",
@@ -42,14 +43,16 @@ export async function deepgramListen({
     });
 
     const transcript = results?.channels?.[0]?.alternatives?.[0]?.transcript;
+    const language = results?.channels?.[0]?.detected_language;
 
     log.info("deepgramListen transcript: ", {
       transcript: transcript,
+      language,
     });
-
     return {
       streamSid,
       finalResult: transcript ?? "",
+      language: language ?? "",
     };
   } catch (error) {
     throw new Error(`Deepgram TTS error ${error}`);

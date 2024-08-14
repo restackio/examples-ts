@@ -1,23 +1,16 @@
-import {
-  step,
-  log,
-  condition,
-  startChild,
-} from "@restackio/restack-sdk-ts/workflow";
+import { step, log, condition } from "@restackio/restack-sdk-ts/workflow";
 import { onEvent } from "@restackio/restack-sdk-ts/event";
 import * as functions from "../../functions";
-import { agentWorkflow } from "../agent/agent";
 import {
-  Answer,
-  answerEvent,
+  Message,
+  messageEvent,
   AudioIn,
   audioInEvent,
-  questionEvent,
   streamEndEvent,
   StreamInfo,
   streamInfoEvent,
 } from "./events";
-import { Reply, replyEvent } from "../agent/events";
+import { workflowInfo } from "@restackio/restack-sdk-ts/workflow";
 
 export async function streamWorkflow() {
   try {
@@ -29,7 +22,6 @@ export async function streamWorkflow() {
       text: string;
     }[] = [];
     let isSendingAudio = false;
-    let childAgentRunId = "";
 
     // Start long running websocket and stream welcome message to websocket.
     onEvent(streamInfoEvent, async ({ streamSid }: StreamInfo) => {
@@ -39,36 +31,15 @@ export async function streamWorkflow() {
         scheduleToCloseTimeout: "30 minutes",
       }).websocketListenMedia({ streamSid });
 
-      const welcomeMessage =
-        "Hello! I am Pete from Apple. Are you thinking about getting AirPods?";
-      const { audio } = await step<typeof functions>({
-        taskQueue: `deepgram`,
-      }).deepgramSpeak({
-        streamSid,
-        text: welcomeMessage,
-      });
-
-      await step<typeof functions>({
-        taskQueue: `websocket`,
-      }).websocketSendAudio({ streamSid, audio });
-
-      await step<typeof functions>({
-        taskQueue: `websocket`,
-      }).websocketSendEvent({
-        streamSid,
-        eventName: answerEvent.name,
-        data: { text: welcomeMessage },
-      });
-
       currentstreamSid = streamSid;
       return { streamSid };
     });
 
     // Receives audio, transcribe it and send transcription to AI agent.
 
-    onEvent(audioInEvent, async ({ streamSid, payload }: AudioIn) => {
+    onEvent(audioInEvent, async ({ streamSid, username, payload }: AudioIn) => {
       log.info(`Workflow update with streamSid: ${streamSid}`);
-      const { finalResult } = await step<typeof functions>({
+      const { finalResult, language } = await step<typeof functions>({
         taskQueue: `deepgram`,
       }).deepgramListen({ streamSid, payload });
 
@@ -78,71 +49,66 @@ export async function streamWorkflow() {
         taskQueue: `websocket`,
       }).websocketSendEvent({
         streamSid,
-        eventName: questionEvent.name,
-        data: { text: finalResult },
+        eventName: messageEvent.name,
+        data: { text: finalResult, language, username },
       });
 
-      if (!childAgentRunId) {
-        const childAgent = await startChild(agentWorkflow, {
-          args: [
-            {
-              streamSid,
-              message: finalResult,
-            },
-          ],
-          workflowId: `${streamSid}-agentWorkflow`,
-        });
-        childAgentRunId = childAgent.firstExecutionRunId;
-      } else {
-        const input: Reply = { streamSid, text: finalResult };
-        step<typeof functions>({
-          taskQueue: `restack`,
-        }).workflowSendEvent({
-          workflowId: `${streamSid}-agentWorkflow`,
-          runId: childAgentRunId,
-          eventName: replyEvent.name,
-          input,
-        });
-      }
+      await step<typeof functions>({
+        taskQueue: "openai",
+      }).openaiChat({
+        streamSid,
+        text: finalResult,
+        username,
+        language,
+        workflowToUpdate: {
+          ...workflowInfo(),
+        },
+      });
+
       return { streamSid };
     });
 
     // Receives AI answer, generates audio and stream it to websocket.
 
-    onEvent(answerEvent, async ({ streamSid, response, isLast }: Answer) => {
-      const { audio } = await step<typeof functions>({
-        taskQueue: `deepgram`,
-      }).deepgramSpeak({
-        streamSid,
-        text: response,
-      });
+    onEvent(
+      messageEvent,
+      async ({ streamSid, response, username, language, isLast }: Message) => {
+        const { audio } = await step<typeof functions>({
+          taskQueue: `elevenlabs`,
+        }).elevenlabsConvert({
+          streamSid,
+          text: response,
+          language,
+          username,
+        });
 
-      audioQueue.push({ streamSid, audio, text: response });
+        audioQueue.push({ streamSid, audio, text: response });
 
-      if (!isSendingAudio && isLast) {
-        isSendingAudio = true;
+        if (!isSendingAudio && isLast) {
+          isSendingAudio = true;
 
-        while (audioQueue.length > 0) {
-          const { streamSid, audio } = audioQueue.shift()!;
+          while (audioQueue.length > 0) {
+            const { streamSid, audio } = audioQueue.shift()!;
+
+            await step<typeof functions>({
+              taskQueue: `websocket`,
+            }).websocketSendAudio({ streamSid, audio, language, username });
+          }
 
           await step<typeof functions>({
             taskQueue: `websocket`,
-          }).websocketSendAudio({ streamSid, audio });
+          }).websocketSendEvent({
+            streamSid,
+            eventName: messageEvent.name,
+            data: { text: response, language, username },
+          });
+
+          isSendingAudio = false;
         }
 
-        await step<typeof functions>({
-          taskQueue: `websocket`,
-        }).websocketSendEvent({
-          streamSid,
-          eventName: answerEvent.name,
-          data: { text: response },
-        });
-
-        isSendingAudio = false;
+        return { streamSid };
       }
-
-      return { streamSid };
-    });
+    );
 
     // Terminates stream workflow.
 
