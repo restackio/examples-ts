@@ -22,6 +22,7 @@ import {
   falImage,
   dndImage,
   elevenlabsConvert,
+  cartesiaSend,
 } from "./functions";
 
 async function main() {
@@ -91,6 +92,12 @@ async function main() {
         taskQueue: "elevenlabs",
         workflowsPath,
         functions: { elevenlabsConvert },
+        rateLimit: 10000,
+      }),
+      restack.startWorker({
+        taskQueue: "cartesia",
+        workflowsPath,
+        functions: { cartesiaSend },
         rateLimit: 10000,
       }),
     ]);

@@ -66,7 +66,7 @@ export async function openaiChat({
         toolCalls.map((toolCall) => {
           log.info("Tool Call", { toolCall });
 
-          const toolAnswer = `Sure, give me a minute to ${toolCall?.function?.name}...`;
+          const toolAnswer = `Let me check the DnD handbook ${toolCall?.function?.name}...`;
           const toolMessage: OpenAI.Chat.Completions.ChatCompletionMessageParam =
             {
               content: toolAnswer,

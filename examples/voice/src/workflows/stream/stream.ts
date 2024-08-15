@@ -40,7 +40,7 @@ export async function streamWorkflow() {
       }).websocketListenMedia({ streamSid });
 
       const welcomeMessage =
-        "Welcome to Dungeons and Dragons. Let's create your character. Do you know the class you want to be?";
+        "Welcome to Dungeons and Dragons. I am your game master. Let's get to know your character. What is your class?";
       const { audio } = await step<typeof functions>({
         taskQueue: `deepgram`,
       }).deepgramSpeak({
