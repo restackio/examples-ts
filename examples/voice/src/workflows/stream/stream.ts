@@ -42,8 +42,8 @@ export async function streamWorkflow() {
       const welcomeMessage =
         "Welcome to Dungeons and Dragons. Let's create your character. Do you know the class you want to be?";
       const { audio } = await step<typeof functions>({
-        taskQueue: `deepgram`,
-      }).deepgramSpeak({
+        taskQueue: `elevenlabs`,
+      }).elevenlabsConvert({
         streamSid,
         text: welcomeMessage,
       });
@@ -111,8 +111,8 @@ export async function streamWorkflow() {
 
     onEvent(answerEvent, async ({ streamSid, response, isLast }: Answer) => {
       const { audio } = await step<typeof functions>({
-        taskQueue: `deepgram`,
-      }).deepgramSpeak({
+        taskQueue: `elevenlabs`,
+      }).elevenlabsConvert({
         streamSid,
         text: response,
       });

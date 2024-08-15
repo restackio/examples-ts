@@ -5,3 +5,4 @@ export * from "./websocket";
 export * from "./dnd";
 export * from "./utils";
 export * from "./fal";
+export * from "./elevenlabs";

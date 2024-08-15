@@ -14,10 +14,6 @@ export async function dndMonster({
   challengeRating,
   monsterIndex,
 }: MonsterInput) {
-  if (!challengeRating && !monsterIndex) {
-    throw new Error("Either challengeRating or monsterIndex must be provided");
-  }
-
   const requestOptions = {
     method: "GET",
     redirect: "follow" as RequestRedirect,
@@ -35,7 +31,8 @@ export async function dndMonster({
     } else {
       throw new Error("Failed to fetch monster");
     }
-  } else {
+  }
+  if (challengeRating) {
     const response = await fetch(
       `https://www.dnd5eapi.co/api/monsters?challenge_rating=${challengeRating}`,
       requestOptions
@@ -53,4 +50,5 @@ export async function dndMonster({
       throw new Error("Failed to fetch monsters list");
     }
   }
+  throw new Error("Either challengeRating or monsterIndex must be provided");
 }

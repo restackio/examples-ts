@@ -24,6 +24,6 @@ export async function dndEquipment({ equipmentIndex }: EquipmentInput) {
     const data = await response.json();
     return data;
   } else {
-    throw new Error("Failed to fetch race");
+    throw new Error("Failed to fetch equipment");
   }
 }

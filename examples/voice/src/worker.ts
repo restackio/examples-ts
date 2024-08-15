@@ -21,6 +21,7 @@ import {
   dndTools,
   falImage,
   dndImage,
+  elevenlabsConvert,
 } from "./functions";
 
 async function main() {
@@ -84,6 +85,12 @@ async function main() {
         taskQueue: "fal",
         workflowsPath,
         functions: { falImage },
+        rateLimit: 10000,
+      }),
+      restack.startWorker({
+        taskQueue: "elevenlabs",
+        workflowsPath,
+        functions: { elevenlabsConvert },
         rateLimit: 10000,
       }),
     ]);
