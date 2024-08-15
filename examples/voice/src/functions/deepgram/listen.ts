@@ -1,7 +1,7 @@
 import { FunctionFailure, log } from "@restackio/restack-sdk-ts/function";
 import { Buffer } from "node:buffer";
 import "dotenv/config";
-import { createClient } from "@deepgram/sdk";
+import { deepgramClient } from "./client";
 
 export async function deepgramListen({
   streamSid,
@@ -15,9 +15,8 @@ export async function deepgramListen({
   }
 
   try {
-    const deepgram = createClient(process.env.DEEPGRAM_API_KEY);
     const decodedBuffer = Buffer.from(payload, "base64");
-
+    const deepgram = deepgramClient();
     const response = await deepgram.listen.prerecorded.transcribeFile(
       decodedBuffer,
       {
@@ -37,18 +36,9 @@ export async function deepgramListen({
     }
 
     const results = response.result?.results;
-
-    log.debug("deepgramListen results:  ", {
-      results: results,
-    });
-
     const transcript = results?.channels?.[0]?.alternatives?.[0]?.transcript;
     const language = results?.channels?.[0]?.detected_language;
 
-    log.info("deepgramListen transcript: ", {
-      transcript: transcript,
-      language,
-    });
     return {
       streamSid,
       finalResult: transcript ?? "",

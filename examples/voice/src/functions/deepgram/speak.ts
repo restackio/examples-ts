@@ -1,7 +1,7 @@
 import { FunctionFailure, log } from "@restackio/restack-sdk-ts/function";
 import { Buffer } from "node:buffer";
 import "dotenv/config";
-import { createClient } from "@deepgram/sdk";
+import { deepgramClient } from "./client";
 
 export const getAudioBuffer = async (stream: ReadableStream<Uint8Array>) => {
   const reader = stream.getReader();
@@ -37,8 +37,7 @@ export async function deepgramSpeak({
   const deepgramModel = "aura-arcas-en";
 
   try {
-    const deepgram = createClient(process.env.DEEPGRAM_API_KEY);
-
+    const deepgram = deepgramClient();
     const response = await deepgram.speak.request(
       { text },
       {

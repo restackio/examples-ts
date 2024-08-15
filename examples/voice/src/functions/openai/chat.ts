@@ -1,11 +1,12 @@
 import OpenAI from "openai";
 import "dotenv/config";
 import { agentPrompt } from "./prompt";
-import Restack from "@restackio/restack-sdk-ts";
 import { Message, messageEvent } from "../../workflows/stream/events";
 import { ChatCompletionChunk } from "openai/resources/chat/completions.mjs";
 import { ParentWorkflowInfo } from "@temporalio/workflow";
+import Restack from "@restackio/restack-sdk-ts";
 import { log } from "@restackio/restack-sdk-ts/function";
+import { openaiClient } from "./client";
 
 export async function openaiChat({
   streamSid,
@@ -22,7 +23,6 @@ export async function openaiChat({
   previousMessages?: OpenAI.Chat.Completions.ChatCompletionMessageParam[];
   workflowToUpdate?: ParentWorkflowInfo;
 }) {
-  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   const restack = new Restack();
 
   let messages = previousMessages ?? [];
@@ -37,6 +37,7 @@ export async function openaiChat({
     });
   }
 
+  const openai = openaiClient();
   const stream = await openai.chat.completions.create({
     model: "gpt-4o-mini",
     messages,
