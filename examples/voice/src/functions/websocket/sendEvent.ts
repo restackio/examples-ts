@@ -7,7 +7,7 @@ export async function websocketSendEvent({
 }: {
   streamSid: string;
   eventName: string;
-  data: { text?: string };
+  data: { text?: string; image?: { prompt: string; url: string } };
 }) {
   const ws = await websocketConnect();
 

@@ -6,9 +6,9 @@ export type ToolCall = {
   function: {
     name: string;
     arguments:
-      | functions.OrderInput
-      | functions.InventoryInput
-      | functions.PriceInput;
+      | functions.ClassInput
+      | functions.RaceInput
+      | functions.ResourceInput;
   };
   id?: string;
 };

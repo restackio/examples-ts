@@ -26,3 +26,4 @@ export const streamEndEvent = defineEvent("streamEnd");
 // use for websocket event shown to show transcript in frontend for ex.
 
 export const questionEvent = defineEvent("question");
+export const imageEvent = defineEvent("image");

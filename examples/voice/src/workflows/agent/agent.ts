@@ -7,6 +7,7 @@ import {
 import * as functions from "../../functions";
 import { onEvent } from "@restackio/restack-sdk-ts/event";
 import { agentEnd, Reply, replyEvent, ToolCall, toolCallEvent } from "./events";
+import { imageEvent } from "../stream/events";
 
 export async function agentWorkflow({
   streamSid,
@@ -24,8 +25,8 @@ export async function agentWorkflow({
     // Get tools definition and start conversation.
 
     const tools = await step<typeof functions>({
-      taskQueue: "erp",
-    }).erpGetTools();
+      taskQueue: "dnd",
+    }).dndTools();
 
     const initialMessages = await step<typeof functions>({
       taskQueue: "openai",
@@ -66,19 +67,49 @@ export async function agentWorkflow({
       log.info("toolCallEvent", { toolFunction });
 
       async function callERPFunction(toolFunction: ToolCall["function"]) {
-        const erpStep = step<typeof functions>({
-          taskQueue: "erp",
+        const dndStep = step<typeof functions>({
+          taskQueue: "dnd",
         });
 
         switch (toolFunction.name) {
-          case "checkPrice":
-            return erpStep.erpCheckPrice({ ...toolFunction.arguments });
-          case "checkInventory":
-            return erpStep.erpCheckInventory({ ...toolFunction.arguments });
-          case "placeOrder":
-            return erpStep.erpPlaceOrder({
-              ...(toolFunction.arguments as functions.OrderInput),
+          case "dndAbilityScore":
+            return dndStep.dndAbilityScore({
+              ...toolFunction.arguments,
             });
+          case "dndAlignment":
+            return dndStep.dndAlignment({
+              ...toolFunction.arguments,
+            });
+          case "dndClass":
+            return dndStep.dndClass({
+              ...toolFunction.arguments,
+            });
+          case "dndCombat":
+            return dndStep.dndCombat({ ...toolFunction.arguments });
+          case "dndEquipment":
+            return dndStep.dndEquipment({ ...toolFunction.arguments });
+          case "dndImage":
+            const image = await dndStep.dndImage({ ...toolFunction.arguments });
+            await step<typeof functions>({
+              taskQueue: `websocket`,
+            }).websocketSendEvent({
+              streamSid,
+              eventName: imageEvent.name,
+              data: { image },
+            });
+          case "dndMonster":
+            return dndStep.dndMonster({ ...toolFunction.arguments });
+          case "dndRace":
+            return dndStep.dndRace({
+              ...toolFunction.arguments,
+            });
+          case "dndResource":
+            return dndStep.dndResource({ ...toolFunction.arguments });
+          case "dndRoleDice":
+            return dndStep.dndRoleDice({ ...toolFunction.arguments });
+          case "dndSkill":
+            return dndStep.dndSkill({ ...toolFunction.arguments });
+
           default:
             throw new Error(`Unknown function name: ${toolFunction.name}`);
         }

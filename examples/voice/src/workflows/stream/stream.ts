@@ -40,7 +40,7 @@ export async function streamWorkflow() {
       }).websocketListenMedia({ streamSid });
 
       const welcomeMessage =
-        "Hello! I am Pete from Apple. Are you thinking about getting AirPods?";
+        "Welcome to Dungeons and Dragons. Let's create your character. Do you know the class you want to be?";
       const { audio } = await step<typeof functions>({
         taskQueue: `deepgram`,
       }).deepgramSpeak({
