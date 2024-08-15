@@ -91,12 +91,13 @@ export async function agentWorkflow({
           case "dndImage":
             const image = await dndStep.dndImage({ ...toolFunction.arguments });
             await step<typeof functions>({
-              taskQueue: `websocket`,
+              taskQueue: "websocket",
             }).websocketSendEvent({
               streamSid,
               eventName: imageEvent.name,
               data: { image },
             });
+            return image;
           case "dndMonster":
             return dndStep.dndMonster({ ...toolFunction.arguments });
           case "dndRace":

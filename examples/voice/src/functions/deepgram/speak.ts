@@ -34,7 +34,7 @@ export async function deepgramSpeak({
     log.error("Text is empty");
     throw FunctionFailure.nonRetryable("Text is empty");
   }
-  const deepgramModel = "aura-arcas-en";
+  const deepgramModel = "aura-orpheus-en";
 
   try {
     const deepgram = deepgramClient();
