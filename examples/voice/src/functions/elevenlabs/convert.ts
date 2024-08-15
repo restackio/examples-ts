@@ -1,6 +1,7 @@
 import { FunctionFailure, log } from "@restackio/restack-sdk-ts/function";
-import { ElevenLabs, ElevenLabsClient } from "elevenlabs";
+import { ElevenLabs } from "elevenlabs";
 import "dotenv/config";
+import { elevenlabsClient } from "./client";
 
 export async function elevenlabsConvert({
   streamSid,
@@ -19,9 +20,7 @@ export async function elevenlabsConvert({
   }
 
   try {
-    const elevenlabs = new ElevenLabsClient({
-      apiKey: process.env.ELEVENLABS_API_KEY,
-    });
+    const elevenlabs = elevenlabsClient();
 
     const voiceId =
       language === "fr"
