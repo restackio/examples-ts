@@ -19,7 +19,7 @@ export const agentPrompt: OpenAI.Chat.Completions.ChatCompletionMessageParam[] =
       Ask for clarification if a user request is ambiguous.
       Dont answer with numbered list or list items and dont use any asterisks (*).
       Dont use emojis and dont display urls.
-      This response is used by text to speech, make it as natural as possible by using filler words like 'um' and 'uh' when necessary.
+      This response is used by text to speech, make it as natural as possible.
       A comma (,) or a period (.) present in your text will be treated as a very short pause.
       If you need to insert a longer pause in your audio, use the ellipsis: ...
       You must add a '•' symbol every 5 to 10 words at natural pauses where your response can be split for text to speech.
