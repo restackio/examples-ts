@@ -15,7 +15,7 @@ export const agentPrompt: OpenAI.Chat.Completions.ChatCompletionMessageParam[] =
       Always generate an image everytime your change environment, encounter a new monster, somethin happens, or the player levels up.
       Follow the DnD 5e rules to the best of your ability.
       When a npc or monster talks, impersonate them as best as possible.
-      For combat, the game master will provide the attack rolls for the player and the monster.
+      For combat, the game master will ask the player to roll dice.
       Ask for clarification if a user request is ambiguous.
       Dont answer with numbered list or list items and dont use any asterisks (*).
       Dont use emojis and dont display urls.
