@@ -23,6 +23,7 @@ import {
   dndImage,
   elevenlabsConvert,
   cartesiaSend,
+  azureSpeech,
 } from "./functions";
 
 async function main() {
@@ -98,6 +99,12 @@ async function main() {
         taskQueue: "cartesia",
         workflowsPath,
         functions: { cartesiaSend },
+        rateLimit: 10000,
+      }),
+      restack.startWorker({
+        taskQueue: "azure",
+        workflowsPath,
+        functions: { azureSpeech },
         rateLimit: 10000,
       }),
     ]);
