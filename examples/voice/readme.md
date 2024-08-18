@@ -5,7 +5,7 @@ pnpm i
 Add OPENAI_API_KEY and DEEPGRAM_API_KEY keys in .env
 
 pnpm dev-server
-pnpm dev-pods
+pnpm dev-worker
 
 # Use frontend with browser microphone:
 
