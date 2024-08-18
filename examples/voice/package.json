@@ -14,7 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "@deepgram/sdk": "^3.5.1",
-    "@restackio/restack-sdk-ts": "^0.0.39",
+    "@restackio/restack-sdk-ts": "^0.0.48",
     "@temporalio/workflow": "1.10.3",
     "axios": "^1.7.3",
     "cors": "^2.8.5",

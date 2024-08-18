@@ -18,12 +18,12 @@ async function main() {
     const restack = new Restack();
 
     await Promise.all([
-      restack.startWorker({
+      restack.startService({
         taskQueue: "restack",
         workflowsPath,
         functions: { workflowSendEvent },
       }),
-      restack.startWorker({
+      restack.startService({
         taskQueue: "websocket",
         workflowsPath,
         functions: {
@@ -32,25 +32,25 @@ async function main() {
           websocketSendEvent,
         },
       }),
-      restack.startWorker({
+      restack.startService({
         taskQueue: "twilio",
         workflowsPath,
         functions: { twilioCall },
         rateLimit: 200,
       }),
-      restack.startWorker({
+      restack.startService({
         taskQueue: "openai",
         workflowsPath,
         functions: { openaiChat },
         rateLimit: 10000,
       }),
-      restack.startWorker({
+      restack.startService({
         taskQueue: "deepgram",
         workflowsPath,
         functions: { deepgramSpeak, deepgramListen },
         rateLimit: 10000,
       }),
-      restack.startWorker({
+      restack.startService({
         taskQueue: "elevenlabs",
         workflowsPath,
         functions: { elevenlabsConvert },
