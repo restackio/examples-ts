@@ -19,7 +19,7 @@
     "author": "Your Name",
     "license": "MIT",
     "dependencies": {
-        "nodemon": "^2.0.22",
+        "nodemon": "^3.1.7",
         "ts-node": "^10.9.2",
         "typescript": "^5.6.2",
         "@restackio/ai": "^0.0.75",
